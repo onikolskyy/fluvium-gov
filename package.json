@@ -1,0 +1,23 @@
+{
+  "name": "superfluid-hack",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+        "prep": "$PWD/run-script",
+        "build": "truffle compile --all && cp build/contracts/LotterySuperApp.json ui/src/",
+        "test": "truffle test",
+        "deploy": "npm run build && RELEASE_VERSION=v1 npx truffle --network ganache exec scripts/deploy.js",
+        "deploy:goerli": "npm run build && RELEASE_VERSION=v1 npx truffle --network goerli exec scripts/deploy.js",
+        "copy-watch": "nodemon --watch \"../../packages\" --ext \"js,ts,tsx,sol\" --exec rsync --archive --delete \"../../packages/\" \"./node_modules/@superfluid-finance/\""
+    },
+  "dependencies": {
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "@superfluid-finance/ethereum-contracts": "^1.0.0-rc.7",
+    "@superfluid-finance/js-sdk": "^0.5.5",
+    "@truffle/hdwallet-provider": "^1.5.1",
+    "dotenv": "^10.0.0",
+    "web3": "^1.6.0",
+    "web3-eth-contract": "^1.6.0"
+  }
+}
