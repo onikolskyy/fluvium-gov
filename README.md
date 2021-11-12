@@ -27,7 +27,7 @@ ______________________________________________
 - ganache-cli
 _____________________________________________
 
-More info on superfluid:
+More info on superfluid: :zap:
 https://docs.superfluid.finance/superfluid/
 
 ***Built for the DAO Global Hackathon ***
