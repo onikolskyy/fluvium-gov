@@ -7,7 +7,7 @@ The incoming flows are distributed to external objectives and the DAO issues NFT
 
 The voting mechanism is based on a simple uniform distribution:
 
-Each owner has 100 Votes and can assign those to objectives. The funds flow is scaled based on the total vote count given to each objective.
+Each Voter has 100 Votes and can assign those to objectives. The funds flow is scaled based on the total vote count given to each objective.
 
 The process can be seen as a form of ***conviction voting***: The opinion of voters is evaluated continuosely over time.
 
