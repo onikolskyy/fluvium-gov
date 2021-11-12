@@ -1,4 +1,12 @@
-require("dotenv").config()
+
+const dotenv = require('dotenv')
+const result = dotenv.config()
+
+if (result.error) {
+  throw result.error
+}
+
+
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 module.exports = {
   networks: {
@@ -18,7 +26,8 @@ module.exports = {
       gasPrice: 10,
     },
     goerli: {
-      provider: () => {return new HDWalletProvider(process.env.MNEMONIC, 'wss://goerli.infura.io/ws/v3/' + process.env.INFURA_API_KEY)},
+      provider: () => {
+        return new HDWalletProvider(process.env.MNEMONIC, 'wss://goerli.infura.io/ws/v3/' + process.env.INFURA_API_KEY)},
       network_id: '*', // eslint-disable-line camelcase
       networkCheckTimeout: 1000000,
       timeoutBlocks: 200000,
