@@ -1,4 +1,4 @@
-# fluvium-gov
+# fluvium-gov :globe_with_meridians:
 *Framework for DAOs allowing voting and distributing funds built with superfluid streams*
 
 
