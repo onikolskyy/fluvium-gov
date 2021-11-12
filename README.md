@@ -13,6 +13,18 @@ The process can be seen as a form of ***conviction voting***: The opinion of vot
 
 Together with budgeting NFTs this contract can be used as a framework for a holistic DAO governement. 
 
+______________________________________________
+**Build from source**
+- hit `npm install` to install dependencies
+- open a local Ganache instance eg by running `ganache-cli`
+- To deploy the superfluid framework locally, run `DISABLE_NATIVE_TRUFFLE=true NEW_TEST_RESOLVER=1 truffle --network ganache exec "node_modules/@superfluid-finance/ethereum-contracts/scripts/deploy-test-environment.js" > log.txt
+`
+- Copy the addresses for `fDai` and the `Resolver` from `log.txt` to a `.dotenv` file. (Hint: The resolver address should appear in the last line of `log.txt`)
+- To run tests, hit truffle `test --network ganache` 
+
+***Dependencies***
+- truffle
+- ganache-cli
 _____________________________________________
 
 More info on superfluid:
