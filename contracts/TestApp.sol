@@ -185,7 +185,7 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
      * GovFlow Logic
      *************************************************************************/
 
-    function addObjective(address objective)
+    function makeProposal(address objective)
     external
     onlyOwner
     {

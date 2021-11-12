@@ -4,7 +4,6 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-        "prep": "$PWD/run-script",
         "build": "truffle compile --all && cp build/contracts/LotterySuperApp.json ui/src/",
         "test": "truffle test",
         "deploy": "npm run build && RELEASE_VERSION=v1 npx truffle --network ganache exec scripts/deploy.js",
