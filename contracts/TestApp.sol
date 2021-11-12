@@ -171,9 +171,9 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
         uint256 configWord =
             SuperAppDefinitions.APP_LEVEL_FINAL |
             SuperAppDefinitions.BEFORE_AGREEMENT_CREATED_NOOP |
-            SuperAppDefinitions.BEFORE_AGREEMENT_UPDATED_NOOP |
-            SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP |
-            SuperAppDefinitions.AFTER_AGREEMENT_TERMINATED_NOOP;
+            //SuperAppDefinitions.BEFORE_AGREEMENT_UPDATED_NOOP |
+            SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP ;
+            //SuperAppDefinitions.AFTER_AGREEMENT_TERMINATED_NOOP;
 
         _host.registerApp(configWord);
 
@@ -190,6 +190,14 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     onlyOwner
     {
         _objectivesArray.push(objective);
+    }
+
+
+    function revokeProposal(address objective)
+    external
+    onlyOwner
+    {
+        // TODO: implement
     }
 
 
@@ -275,6 +283,23 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     }
 
 
+        function beforeAgreementUpdated(
+            ISuperToken superToken,
+            address agreementClass,
+            bytes32 agreementId,
+            bytes calldata /*agreementData*/,
+            bytes calldata ctx
+        )
+        external view override
+        onlyHost
+        returns (bytes memory cbdata)
+    {
+         (,int96 flowRate,,) = _cfa.getFlowByID(_acceptedToken, agreementId);
+        _flowRateIn = _flowRateIn - flowRate;
+        return ctx;
+    }
+
+
      function afterAgreementUpdated(
         ISuperToken /* superToken */,
         address agreementClass,
@@ -285,11 +310,29 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     )
         external override
         onlyHost
-        returns (bytes memory newCtx)
+        returns (bytes memory)
     {
         return _updateOutFlowFromCB(ctx);
     }
 
+
+
+    function afterAgreementTerminated(
+        ISuperToken /* superToken */,
+        address /* agreementClass */,
+        bytes32 agreementId ,
+        bytes calldata agreementData,
+        bytes calldata cbdata,
+        bytes calldata ctx
+    )
+        external override
+        onlyHost
+        returns (bytes memory newCtx)
+    {
+         (,int96 flowRate,,) = _cfa.getFlowByID(_acceptedToken, agreementId);
+        _flowRateIn = _flowRateIn - flowRate;
+        return ctx;
+    }
 
     modifier onlyHost() {
         require(msg.sender == address(_host), "Process SuperApp: supports only one host");

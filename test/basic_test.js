@@ -1,4 +1,5 @@
 const { web3tx, toWad } = require("@decentral.ee/web3-helpers");
+const BN = web3.utils.BN;
 
 const SuperfluidSDK = require("@superfluid-finance/js-sdk");
 const Test = artifacts.require("TestApp")
@@ -18,7 +19,7 @@ async function flowExists(sf,from,to) {
                     from,
                     to
                 )
-            )[1].toString() !== "0";
+            )[1].toString();
         // console.log("flow of: " + users[who] + " exists? " + value);
         return value;
 }
@@ -53,12 +54,12 @@ async function flowExists(sf,from,to) {
         return b;
     }
 
-contract("RoleGovFlow", accounts => {
+contract("FluviumGov-Basic", accounts => {
 
     let sf;
 
-    accounts = accounts.slice(0, 7);
-    const [admin, bob, carol, dan, optionA, optionB] = accounts;
+    accounts = accounts.slice(0, 8);
+    const [admin, bob, carol, dan, optionA, optionB, optionC] = accounts;
 
     before(async function(){
          sf = new SuperfluidSDK.Framework({web3,version: "test",tokens: ['fDAI']})
@@ -66,7 +67,7 @@ contract("RoleGovFlow", accounts => {
     })
 
     beforeEach(async function() {
-       dai = await sf.contracts.TestToken.at("0x59fA86f45767190Bcb925538Add2804d50348a9F");
+       dai = await sf.contracts.TestToken.at(process.env.TEST_FDAI_ADDRESS);
 
         for (let i = 0; i < accounts.length; ++i) {
             await web3tx(dai.mint, `Account ${i} mints many dai`)(
@@ -78,7 +79,8 @@ contract("RoleGovFlow", accounts => {
 
         daix = sf.tokens.fDAIx;
 
-        app = await web3tx(Test.new, "Deploy LotterySuperApp")(
+
+        app = await Test.new(
             "GovernanceNFT",
             "GOVx",
             admin,
@@ -96,13 +98,14 @@ contract("RoleGovFlow", accounts => {
             await daix.upgrade((toWad(1000)).toString(), {
                 from: accounts[i]
             });
-
-            // dan gives app a dollar so it won't break
-            await daix.transfer(app.address, (1 * 1e18).toString(), { from: dan });
         }
+
+             // dan gives app a dollar so it won't break
+            await daix.transfer(app.address, (toWad(1000)).toString(), { from: dan });
+
     })
 
-    it("#1",async ()=>{
+    it("#1: basic",async ()=>{
 
         // Admin creates a flow of global funds
         await sf.cfa.createFlow({
@@ -112,16 +115,20 @@ contract("RoleGovFlow", accounts => {
             flowRate: String("385802469135802")
         });
 
+
+
+        let res = await app.issueNFT(bob, {from:admin});
+        let tokenId = res.logs[0].args.tokenId
+
         // There are two options which can be funded
-        await app.addObjective(optionA);
-        await app.addObjective(optionB);
+        await app.makeProposal(optionA, {from:admin});
+        await app.makeProposal(optionB, {from:admin});
 
         // Now the fellow DAOists have to vote!
-        await app.reVote(optionA, "10", {from: bob});
-        await app.reVote(optionB, "90", {from: bob});
-        //app.reVoteTest().on('data', event => console.log(event))
-
-
+        await app.reVote(tokenId,optionA, "5", {from: bob});
+        await app.reVote(tokenId, optionB, "90", {from: bob});
+        //
+        //
         // carol provides more funding streams!
         await sf.cfa.createFlow({
             superToken:daix.address,
@@ -131,6 +138,10 @@ contract("RoleGovFlow", accounts => {
         });
 
 
+        console.log(await flowExists(sf, app.address, optionB))
+
+        //
+        //
 
 
     })

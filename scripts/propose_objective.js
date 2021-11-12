@@ -30,7 +30,7 @@ module.exports = async function(cb, argv) {
 
     let tx = {
         'to': TestApp.address,
-        'gas': 3000000,
+        'gas': 303000,
         'nonce': nonce,
         'data': txData
     }
