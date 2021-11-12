@@ -2,8 +2,8 @@
 *Framework for DAOs allowing voting and distributing funds built with superfluid streams*
 
 
-This is a counterpart to https://github.com/superfluid-finance/protocol-monorepo/tree/dao-global-examples/examples/dao-budgeting-nft:
-The incoming flows are distributed among given objectives and the DAO issues NFTs which give their owner the permission to control the outgoing flows.
+This is the counterpart to https://github.com/superfluid-finance/protocol-monorepo/tree/dao-global-examples/examples/dao-budgeting-nft:
+The incoming flows are distributed to external objectives and the DAO issues NFTs which give their owner the permission to control the outgoing flows.
 
 The voting mechanism is based on a simple uniform distribution:
 
