@@ -1,4 +1,4 @@
-# fluvium-gov :globe_with_meridians:
+# fluvium-gov :globe_with_meridians: :flying_saucer:
 *Framework for DAOs allowing voting and distributing funds built with superfluid streams*
 
 
