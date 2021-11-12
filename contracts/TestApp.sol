@@ -16,7 +16,7 @@ import {
 } from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperAppBase.sol";
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 library GovFlowLogic {
 
@@ -131,7 +131,7 @@ library GovFlowLogic {
 
 }
 
-contract TestApp is SuperAppBase, ERC721 {
+contract TestApp is SuperAppBase, ERC721, Ownable {
 
     ISuperfluid private _host; // host
     IConstantFlowAgreementV1 private _cfa; // the stored constant flow agreement class address
@@ -142,10 +142,10 @@ contract TestApp is SuperAppBase, ERC721 {
     int96 private _flowRateIn;
 
     address[] private _objectivesArray;  // save objectives here
-    mapping(address => mapping(address => int96)) _voteAmounts;    // opinion per voter per objective
-    mapping(address => int96) _totalOpinions;
+    mapping(uint256 => mapping(address => int96)) _votes;    // opinion per voter per objective
+    mapping(address => int96) _totalVotes;
 
-    uint16 MAX_VOTERS;
+    int96 private _totalSupply; // TODO: it shoul be uint256
 
     uint256 public nextId; // this is so we can increment the number (each stream has new id we store in flowRates)
 
@@ -176,6 +176,8 @@ contract TestApp is SuperAppBase, ERC721 {
             SuperAppDefinitions.AFTER_AGREEMENT_TERMINATED_NOOP;
 
         _host.registerApp(configWord);
+
+        _totalSupply = 0;
     }
 
 
@@ -184,21 +186,22 @@ contract TestApp is SuperAppBase, ERC721 {
      *************************************************************************/
 
     function addObjective(address objective)
-    public
+    external
+    onlyOwner
     {
         _objectivesArray.push(objective);
     }
 
-    event reVoteTest(int96 flowRateIn, int96 flowRateOut);
 
-
-    function reVote(address objective, int96 newVote)
+    function reVote(uint256 tokenId, address objective, int96 newVote)
     external //returns (int96)
     {
+        require(msg.sender==ownerOf(tokenId), "Only NFT owners can vote");
+
         (, int96 flowRate,,) = _cfa.getFlow(_acceptedToken,address(this), objective);
-        _totalOpinions[objective] = _totalOpinions[objective] - _voteAmounts[msg.sender][objective] + newVote;
-        _voteAmounts[msg.sender][objective] = newVote;
-        GovFlowLogic.modifyOutFlow(_host, _cfa, _acceptedToken, objective, flowRate, _flowRateIn *  _totalOpinions[objective] / (VOTE_AMOUNT));
+        _totalVotes[objective] = _totalVotes[objective] - _votes[tokenId][objective] + newVote;
+        _votes[tokenId][objective] = newVote;
+        GovFlowLogic.modifyOutFlow(_host, _cfa, _acceptedToken, objective, flowRate, _flowRateIn *  _totalVotes[objective] / (VOTE_AMOUNT * _totalSupply));
     }
 
     // scale all outgoing flows if incoming flow change
@@ -209,17 +212,40 @@ contract TestApp is SuperAppBase, ERC721 {
         for(uint i=0; i < _objectivesArray.length;i++)
         {
             (, int96 flowRate,,) = _cfa.getFlow(_acceptedToken,address(this), _objectivesArray[i]);
-            if(_totalOpinions[_objectivesArray[i]] > 0){
+            if(_totalVotes[_objectivesArray[i]] > 0){
                 newCtx = GovFlowLogic.modifyOutFlowWithContext(
                     _host, _cfa, _acceptedToken,
                     _objectivesArray[i], flowRate,
-                    _flowRateIn *  _totalOpinions[_objectivesArray[i]] / (VOTE_AMOUNT),
+                    _flowRateIn *  _totalVotes[_objectivesArray[i]] / (VOTE_AMOUNT * _totalSupply),
                     newCtx
                 );
             }
         }
 
         return newCtx;
+    }
+
+
+    /////////////////////////////////////////////////////
+    //
+    // NFT logic
+    //
+    ////////////////////////////////////////////////////
+
+    event NFTIssued(uint256 tokenId);
+
+    function issueNFT(address receiver) external onlyOwner{
+        _issueNFT(receiver);
+    }
+
+    function _issueNFT(address receiver) internal{
+        require(receiver != address(this), "Issue to a new address");
+        _mint(receiver, nextId);
+
+        emit NFTIssued(nextId);
+
+        nextId += 1;
+        _totalSupply = _totalSupply + 1;
     }
 
 
