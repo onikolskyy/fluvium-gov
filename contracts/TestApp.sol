@@ -144,6 +144,7 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     address[] private _objectivesArray;  // save objectives here
     mapping(uint256 => mapping(address => int96)) _votes;    // opinion per voter per objective
     mapping(address => int96) _totalVotes;
+    mapping(bytes32 => int96) _inFlowRates;
 
     int96 private _totalSupply; // TODO: it shoul be uint256
 
@@ -219,8 +220,8 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
         newCtx = ctx;
         for(uint i=0; i < _objectivesArray.length;i++)
         {
-            (, int96 flowRate,,) = _cfa.getFlow(_acceptedToken,address(this), _objectivesArray[i]);
             if(_totalVotes[_objectivesArray[i]] > 0){
+                (, int96 flowRate,,) = _cfa.getFlow(_acceptedToken,address(this), _objectivesArray[i]);
                 newCtx = GovFlowLogic.modifyOutFlowWithContext(
                     _host, _cfa, _acceptedToken,
                     _objectivesArray[i], flowRate,
@@ -279,24 +280,8 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     {
         (,int96 flowRate,,) = _cfa.getFlowByID(_acceptedToken, agreementId);
         _flowRateIn = _flowRateIn + flowRate;
+        _inFlowRates[agreementId] = flowRate;
         return _updateOutFlowFromCB(ctx);
-    }
-
-
-        function beforeAgreementUpdated(
-            ISuperToken superToken,
-            address agreementClass,
-            bytes32 agreementId,
-            bytes calldata /*agreementData*/,
-            bytes calldata ctx
-        )
-        external view override
-        onlyHost
-        returns (bytes memory cbdata)
-    {
-         (,int96 flowRate,,) = _cfa.getFlowByID(_acceptedToken, agreementId);
-        _flowRateIn = _flowRateIn - flowRate;
-        return ctx;
     }
 
 
@@ -312,6 +297,8 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
         onlyHost
         returns (bytes memory)
     {
+         (,int96 flowRate,,) = _cfa.getFlowByID(_acceptedToken, agreementId);
+        _flowRateIn = _flowRateIn - _inFlowRates[agreementId] + flowRate;
         return _updateOutFlowFromCB(ctx);
     }
 
@@ -327,11 +314,11 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     )
         external override
         onlyHost
-        returns (bytes memory newCtx)
+        returns (bytes memory )
     {
          (,int96 flowRate,,) = _cfa.getFlowByID(_acceptedToken, agreementId);
         _flowRateIn = _flowRateIn - flowRate;
-        return ctx;
+        return _updateOutFlowFromCB(ctx);
     }
 
     modifier onlyHost() {
