@@ -11,7 +11,7 @@ Each Voter has 100 Votes and can assign those to objectives. The funds flow is s
 
 The process can be seen as a form of ***conviction voting***: The opinion of voters is evaluated continuosely over time.
 
-Together with budgeting NFTs this contract can be used as a framework for a holistic DAO governement. 
+Together with budgeting NFTs this contract can be used as a holistic framework for DAO governement. 
 
 ______________________________________________
 **Build from source**
