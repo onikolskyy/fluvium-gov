@@ -27,11 +27,8 @@ module.exports = {
     },
     goerli: {
       provider: () => {
-        return new HDWalletProvider(process.env.MNEMONIC, 'wss://goerli.infura.io/ws/v3/' + process.env.INFURA_API_KEY)},
-      network_id: '*', // eslint-disable-line camelcase
-      networkCheckTimeout: 1000000,
-      timeoutBlocks: 200000,
-      gas: 29941438
+        return new HDWalletProvider(process.env.MNEMONIC, 'wss://eth-goerli.alchemyapi.io/v2/pNVs9VSXQoOWRWcS7roK6Qwa49UN23bz')},
+      network_id: '*' // eslint-disable-line camelcase
     },
   },
 

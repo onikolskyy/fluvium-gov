@@ -115,8 +115,6 @@ contract("FluviumGov-Basic", accounts => {
             flowRate: String("385802469135802")
         });
 
-
-
         let res = await app.issueNFT(bob, {from:admin});
         let tokenId = res.logs[0].args.tokenId
 
@@ -125,8 +123,8 @@ contract("FluviumGov-Basic", accounts => {
         await app.makeProposal(optionB, {from:admin});
 
         // Now the fellow DAOists have to vote!
-        await app.reVote(tokenId,optionA, "5", {from: bob});
-        await app.reVote(tokenId, optionB, "90", {from: bob});
+        await app.reVote(0,optionA, "5", {from: bob});
+        await app.reVote(tokenId, optionB, "10", {from: bob});
         //
         //
         // carol provides more funding streams!
@@ -139,7 +137,8 @@ contract("FluviumGov-Basic", accounts => {
 
 
         console.log(await flowExists(sf, app.address, optionB))
-
+        await app.reVote(tokenId, optionB, "20", {from: bob});
+        console.log(await flowExists(sf, app.address, optionB))
         //
         //
 

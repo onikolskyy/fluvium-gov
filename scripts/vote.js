@@ -31,7 +31,9 @@ module.exports = async function(cb,argv) {
     const tokenId = args.pop();
     const _sender = args.pop();
 
-    const txData = (await app.methods.reVote(tokenId, objective, vote)).encodeABI()
+    let tokenBN = new web3.utils.BN(tokenId);
+
+    const txData = (await app.methods.reVote(tokenBN, objective, vote)).encodeABI()
     const nonce = await web3.eth.getTransactionCount(_sender, 'latest'); // nonce starts counting from 0
 
     let tx = {

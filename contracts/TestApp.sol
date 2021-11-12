@@ -180,6 +180,7 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
         _host.registerApp(configWord);
 
         _totalSupply = 0;
+        nextId = 0;
     }
 
 
