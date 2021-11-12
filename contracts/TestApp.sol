@@ -145,6 +145,7 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     mapping(uint256 => mapping(address => int96)) _votes;    // opinion per voter per objective
     mapping(address => int96) _totalVotes;
     mapping(bytes32 => int96) _inFlowRates;
+    mapping(uint256 => int96) _totalVotesUsed;
 
     int96 private _totalSupply; // TODO: it shoul be uint256
 
@@ -206,7 +207,9 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     external //returns (int96)
     {
         require(msg.sender==ownerOf(tokenId), "Only NFT owners can vote");
+        require(newVote >= 0, "can't be negative");
 
+        require(_totalVotesUsed[tokenId] - _votes[tokenId][objective] + newVote <= 100, "a voter has 100 votes");
         (, int96 flowRate,,) = _cfa.getFlow(_acceptedToken,address(this), objective);
         _totalVotes[objective] = _totalVotes[objective] - _votes[tokenId][objective] + newVote;
         _votes[tokenId][objective] = newVote;
