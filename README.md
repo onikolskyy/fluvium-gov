@@ -13,6 +13,8 @@ The process can be seen as a form of ***conviction voting***: The opinion of vot
 
 Together with budgeting NFTs this contract can be used as a holistic framework for DAO governement. 
 
+Video: https://www.youtube.com/watch?v=G6NTRRKp6LM
+
 ______________________________________________
 **Build from source**
 - hit `npm install` to install dependencies
