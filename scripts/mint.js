@@ -19,8 +19,9 @@ module.exports = async function(cb, argv) {
 
     const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER));
     const app = await new web3.eth.Contract(TestAppABI, TestApp.address);
-    console.log(TestApp.address)
+
     const args = parseColonArgs(argv || process.argv);
+
     if (args.length !== 2) {
         console.log("Wrong number of arguments");
         cb()
@@ -29,7 +30,7 @@ module.exports = async function(cb, argv) {
     const _receiver = args.pop()
     const _sender = args.pop();
 
-    const txData = (await app.methods.makeProposal(_receiver)).encodeABI()
+    const txData = (await app.methods.issueNFT(_receiver)).encodeABI()
     const nonce = await web3.eth.getTransactionCount(_sender, 'latest'); // nonce starts counting from 0
 
     let tx = {
@@ -44,11 +45,11 @@ module.exports = async function(cb, argv) {
   await web3.eth.sendSignedTransaction(signedTx.rawTransaction, function(error, hash) {
     if (!error) {
         console.log("🎉 The hash of your transaction is: ", hash);
-        cb();
     } else {
         console.log("❗Something went wrong while submitting your transaction:", error)
-        cb()
     }
    });
+
+
 
 }

@@ -30,22 +30,22 @@ library GovFlowLogic {
     )
     internal
     {
-        if(newOutFlow <= 0 && flowRate > 0){
-            // close stream to objective
-            _host.callAgreement(
-                _cfa,
-                abi.encodeWithSelector(
-                    _cfa.deleteFlow.selector,
-                    _acceptedToken,
-                    address(this),
-                    objective,
-                    new bytes(0)
-                ), // call data
-                new bytes(0) // user data
-            );
-        } else {
-            if(flowRate > 0){
+        if(flowRate > 0){
+            if(newOutFlow <= 0){
+                 // close stream to objective
                 _host.callAgreement(
+                    _cfa,
+                    abi.encodeWithSelector(
+                        _cfa.deleteFlow.selector,
+                        _acceptedToken,
+                        address(this),
+                        objective,
+                        new bytes(0)
+                    ), // call data
+                    new bytes(0) // user data
+                );
+            } else {
+                  _host.callAgreement(
                     _cfa,
                     abi.encodeWithSelector(
                         _cfa.updateFlow.selector,
@@ -56,9 +56,12 @@ library GovFlowLogic {
                     ), // call data
                     new bytes(0) // user data
                 );
+            }
+        } else {
+            if(newOutFlow <= 0){
+                return;
             } else {
-                // open new stream to objective
-                _host.callAgreement(
+                 _host.callAgreement(
                     _cfa,
                     abi.encodeWithSelector(
                         _cfa.createFlow.selector,
@@ -83,23 +86,23 @@ library GovFlowLogic {
         bytes memory ctx
     )
     internal returns (bytes memory newCtx){
-         if(newOutFlow <= 0 && flowRate > 0){
-            // close stream to objective
-             (newCtx,) = _host.callAgreementWithContext(
-                _cfa,
-                abi.encodeWithSelector(
-                    _cfa.deleteFlow.selector,
-                    _acceptedToken,
-                    address(this),
-                    objective,
-                    new bytes(0)
-                ), // call data
-                new bytes(0), // user data
-                ctx
-            );
-        } else {
-            if( flowRate > 0){
-                (newCtx,) = _host.callAgreementWithContext(
+        if(flowRate > 0){
+            if(newOutFlow <= 0){
+                // close stream to objective
+                 (newCtx,) = _host.callAgreementWithContext(
+                    _cfa,
+                    abi.encodeWithSelector(
+                        _cfa.deleteFlow.selector,
+                        _acceptedToken,
+                        address(this),
+                        objective,
+                        new bytes(0)
+                    ), // call data
+                    new bytes(0), // user data
+                    ctx
+                );
+            } else {
+                  (newCtx,) = _host.callAgreementWithContext(
                     _cfa,
                     abi.encodeWithSelector(
                         _cfa.updateFlow.selector,
@@ -111,9 +114,12 @@ library GovFlowLogic {
                     new bytes(0), // user data
                     ctx
                 );
+            }
+        } else {
+             if(newOutFlow <= 0){
+                newCtx = ctx;
             } else {
-                // open new stream to objective
-                (newCtx,) = _host.callAgreementWithContext(
+                 (newCtx,) = _host.callAgreementWithContext(
                     _cfa,
                     abi.encodeWithSelector(
                         _cfa.createFlow.selector,
@@ -125,8 +131,9 @@ library GovFlowLogic {
                     new bytes(0), // user data
                     ctx
                 );
-            }
+             }
         }
+
     }
 
 }
@@ -207,7 +214,7 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     function reVote(uint256 tokenId, address objective, int96 newVote)
     external //returns (int96)
     {
-        require(msg.sender==ownerOf(tokenId), "Only NFT owners can vote");
+        require(msg.sender == ownerOf(tokenId), "Only NFT owners can vote");
         require(newVote >= 0, "can't be negative");
 
         require(_totalVotesUsed[tokenId] - _votes[tokenId][objective] + newVote <= 100, "a voter has 100 votes");

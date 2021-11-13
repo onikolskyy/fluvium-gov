@@ -61,6 +61,10 @@ contract("FluviumGov-Basic", accounts => {
     accounts = accounts.slice(0, 8);
     const [admin, bob, carol, dan, optionA, optionB, optionC] = accounts;
 
+    console.log(">>admin", admin)
+    console.log(">>bob", bob)
+    console.log(">>optionB", optionB)
+
     before(async function(){
          sf = new SuperfluidSDK.Framework({web3,version: "test",tokens: ['fDAI']})
          await sf.initialize();
@@ -106,14 +110,14 @@ contract("FluviumGov-Basic", accounts => {
     })
 
     it("#1: basic",async ()=>{
-
+/*
         // Admin creates a flow of global funds
         await sf.cfa.createFlow({
             superToken:daix.address,
             sender: admin,
             receiver: app.address,
             flowRate: String("385802469135802")
-        });
+        });*/
 
         let res = await app.issueNFT(bob, {from:admin});
         let tokenId = res.logs[0].args.tokenId
@@ -123,7 +127,7 @@ contract("FluviumGov-Basic", accounts => {
         await app.makeProposal(optionB, {from:admin});
 
         // Now the fellow DAOists have to vote!
-        await app.reVote(0,optionA, "5", {from: bob});
+        await app.reVote(tokenId,optionA, "5", {from: bob});
         await app.reVote(tokenId, optionB, "10", {from: bob});
         //
         //
@@ -139,11 +143,16 @@ contract("FluviumGov-Basic", accounts => {
         console.log(await flowExists(sf, app.address, optionB))
         await app.reVote(tokenId, optionB, "20", {from: bob});
         console.log(await flowExists(sf, app.address, optionB))
-        //
-        //
 
+
+        await sf.cfa.createFlow({
+            superToken:daix.address,
+            sender: carol,
+            receiver: app.address,
+        });
+
+        console.log(await flowExists(sf, app.address, optionB))
 
     })
-
 
 })
