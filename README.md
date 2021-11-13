@@ -37,9 +37,9 @@ ______________________________________________
 
 TODOs:
 
-1. implement NFT issuing
-2. provide more tests
-4. optimize memory usage
-5. integrate the budgeting functionality
-6. build a frontend
-7. deploy on Goerli
+- [ ] implement NFT issuing 
+- [ ] provide more tests
+- [ ] optimize memory usage
+- [ ] integrate the budgeting functionality
+- [ ] build a frontend
+- [x] deploy on Goerli
