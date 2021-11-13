@@ -145,13 +145,57 @@ contract("FluviumGov-Basic", accounts => {
         console.log(await flowExists(sf, app.address, optionB))
 
 
-        await sf.cfa.createFlow({
+
+        // Check that all outStreams are closed after all inStreams close
+        await sf.cfa.deleteFlow({
             superToken:daix.address,
             sender: carol,
             receiver: app.address,
         });
 
+        console.log("after deleting all inFlows:", await flowExists(sf, app.address, optionB))
+
+    })
+
+
+
+     it("#2: basic",async ()=>{
+
+        // Admin creates a flow of global funds
+        await sf.cfa.createFlow({
+            superToken:daix.address,
+            sender: admin,
+            receiver: app.address,
+            flowRate: String("385802469135802")
+        });
+
+        let res = await app.issueNFT(bob, {from:admin});
+        let tokenId = res.logs[0].args.tokenId
+
+        // There are two options which can be funded
+        await app.makeProposal(optionA, {from:admin});
+        await app.makeProposal(optionB, {from:admin});
+
+        // Now the fellow DAOists have to vote!
+        await app.reVote(tokenId,optionA, "5", {from: bob});
+        await app.reVote(tokenId, optionB, "10", {from: bob});
+        //
+        //
+        // carol provides more funding streams!
+        await sf.cfa.createFlow({
+            superToken:daix.address,
+            sender: carol,
+            receiver: app.address,
+            flowRate: String("385802469135802")
+        });
+
+        await app.reVote(tokenId, optionB, "20", {from: bob});
         console.log(await flowExists(sf, app.address, optionB))
+
+        await app.reVote(tokenId,optionA, "0", {from: bob});
+        await app.reVote(tokenId, optionB, "0", {from: bob});
+
+        console.log("after deleting all votes:", await flowExists(sf, app.address, optionB))
 
     })
 

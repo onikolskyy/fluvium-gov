@@ -314,7 +314,6 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
     }
 
 
-
     function afterAgreementTerminated(
         ISuperToken /* superToken */,
         address /* agreementClass */,
@@ -327,8 +326,7 @@ contract TestApp is SuperAppBase, ERC721, Ownable {
         onlyHost
         returns (bytes memory )
     {
-         (,int96 flowRate,,) = _cfa.getFlowByID(_acceptedToken, agreementId);
-        _flowRateIn = _flowRateIn - flowRate;
+        _flowRateIn = _flowRateIn - _inFlowRates[agreementId];
         return _updateOutFlowFromCB(ctx);
     }
 
